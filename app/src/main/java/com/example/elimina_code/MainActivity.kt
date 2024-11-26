@@ -18,7 +18,7 @@ import androidx.viewpager2.widget.ViewPager2
 import java.io.OutputStream
 import java.net.Socket
 
-
+//ciao bello mio
 class MainActivity : AppCompatActivity() {
 
     private var counter = 0
