@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="25dp"
+    android:gravity="center">
+
+    <!-- Pulsante Aggiungi Reparto -->
+    <Button
+        android:id="@+id/addRepartoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aggiungi Reparto"
+        android:background="@drawable/rounded_button"
+        android:textSize="18sp"
+    android:layout_marginBottom="20dp"
+    android:padding="20dp" />
+
+    <!-- Pulsante Azzeramento Contatori -->
+    <Button
+        android:id="@+id/resetButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Azzeramento Contatori"
+        android:background="@drawable/rounded_button"
+        android:textSize="18sp"
+    android:layout_marginBottom="20dp"
+    android:padding="20dp" />
+
+    <!-- Pulsante Elimina Reparto -->
+    <Button
+        android:id="@+id/deleteRepartoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Elimina Reparto"
+        android:background="@drawable/rounded_button"
+        android:textSize="18sp"
+    android:layout_marginBottom="20dp"
+    android:padding="20dp" />
+
+    <!-- Pulsante Torna alla pagina principale -->
+    <Button
+        android:id="@+id/exitButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Torna alla pagina principale"
+        android:background="@drawable/rounded_button"
+        android:textSize="18sp"
+    android:layout_marginTop="20dp"
+    android:padding="20dp" />
+
+</LinearLayout>

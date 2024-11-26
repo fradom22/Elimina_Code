@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Elimina_Code" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Altre configurazioni del tema -->
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryVariant">@color/dark_green</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+    </style>
+</resources>

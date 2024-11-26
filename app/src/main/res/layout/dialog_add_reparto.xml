@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Campo di input per il nome del reparto -->
+    <EditText
+        android:id="@+id/inputRepartoName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Inserisci il nome del reparto"
+        android:inputType="text" />
+
+    <!-- Spinner per la selezione del colore -->
+    <Spinner
+        android:id="@+id/colorSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
