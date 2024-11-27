@@ -4,16 +4,30 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 class AdminActivity : AppCompatActivity() {
 
+    private lateinit var modeSwitch: Switch
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin)
+
+        // Configura lo switch per cambiare modalità
+        modeSwitch = findViewById(R.id.modeSwitch)
+        modeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                Toast.makeText(this, "Modalità Stampa", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Modalità Visione", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         setupAddRepartoButton()
         setupResetButton()
@@ -65,11 +79,13 @@ class AdminActivity : AppCompatActivity() {
 
             dialogBuilder.setNegativeButton("Annulla") { dialog, _ -> dialog.dismiss() }
 
-            dialogBuilder.show()
+            // Mostra il dialogo
+            val dialog = dialogBuilder.create()
+            dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)  // Arrotondamento
+
+            dialog.show()
         }
     }
-
-
 
     private fun setupResetButton() {
         val resetButton = findViewById<Button>(R.id.resetButton)
@@ -97,7 +113,11 @@ class AdminActivity : AppCompatActivity() {
 
             dialogBuilder.setNegativeButton("Annulla") { dialog, _ -> dialog.dismiss() }
 
-            dialogBuilder.show()
+            // Imposta il background arrotondato per il dialogo
+            val dialog = dialogBuilder.create()
+            dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)
+
+            dialog.show()
         }
     }
 

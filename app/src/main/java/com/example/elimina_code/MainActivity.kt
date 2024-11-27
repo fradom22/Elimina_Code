@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         val rootView = findViewById<View>(android.R.id.content)
         rootView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                if (isInTopRightCorner(event.x, event.y)) {
+                if (isInTopLeftCorner(event.x, event.y)) { // Cambiato da topRight a topLeft
                     touchCount++
                     if (touchCount == 3) {
                         showPasswordDialog()
@@ -151,21 +151,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun isInTopRightCorner(x: Float, y: Float): Boolean {
+    private fun isInTopLeftCorner(x: Float, y: Float): Boolean {
         val screenWidth = resources.displayMetrics.widthPixels
         val screenHeight = resources.displayMetrics.heightPixels
-        return x > screenWidth * 0.9 && y < screenHeight * 0.1
+        return x < screenWidth * 0.1 && y < screenHeight * 0.1 // Cambiato per l'angolo sinistro
     }
 
     private fun showPasswordDialog() {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setTitle("Accesso riservato")
 
+        // Crea il campo per inserire la password
         val passwordInput = EditText(this).apply {
             hint = "Inserisci la password"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            // Aggiungi padding per distanziare il testo dai bordi
+            setPadding(40, 30, 40, 30) // Aggiungi più padding ai lati del campo di input
         }
-        dialogBuilder.setView(passwordInput)
+
+        // Crea il layout personalizzato per il dialogo
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(50, 50, 50, 50)  // Aggiungi padding per dare spazio ai contenuti
+            addView(passwordInput)      // Aggiungi il campo della password
+        }
+
+        dialogBuilder.setView(layout)
 
         dialogBuilder.setPositiveButton("OK") { _, _ ->
             if (passwordInput.text.toString() == "1234") {
@@ -176,8 +187,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         dialogBuilder.setNegativeButton("Annulla", null)
-        dialogBuilder.show()
+
+        // Mostra il dialogo
+        val dialog = dialogBuilder.create()
+        dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)  // Arrotondamento
+
+        dialog.show()
     }
+
+
+
+
 
     private fun initSlideshow() {
         viewPager = findViewById(R.id.slideshow)

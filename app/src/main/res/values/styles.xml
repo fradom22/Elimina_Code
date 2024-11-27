@@ -3,19 +3,19 @@
     <!-- Pulsanti arrotondati, verde con testo bianco -->
     <style name="CustomButtonStyle">
         <!-- Colore di sfondo del pulsante -->
-        <item name="android:backgroundTint">@color/buttonColor</item>
+        <item name="android:backgroundTint">#1B33A4</item>
 
         <!-- Colore del testo del pulsante -->
         <item name="android:textColor">@color/buttonTextColor</item>
 
         <!-- Dimensione del testo -->
-        <item name="android:textSize">18sp</item> <!-- Riduciamo la dimensione -->
+        <item name="android:textSize">18sp</item>
 
         <!-- Padding interno per rendere i pulsanti più grandi -->
         <item name="android:padding">16dp</item>
 
         <!-- Bordi arrotondati -->
-        <item name="android:radius">16dp</item> <!-- Arrotondiamo i bordi -->
+        <item name="android:radius">16dp</item>
 
         <!-- Larghezza e altezza dei pulsanti -->
         <item name="android:layout_width">match_parent</item>

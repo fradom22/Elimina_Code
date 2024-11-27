@@ -3,14 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="16dp">
 
     <!-- Contenitore per lo slideshow delle immagini -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/slideshow"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@drawable/rounded_image_slider"
         android:clipToPadding="true"
@@ -18,8 +18,8 @@
 
     <!-- Contenitore per i reparti -->
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -37,8 +37,7 @@
         <!-- ScrollView per i reparti -->
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:fillViewport="true">
 
             <LinearLayout
@@ -48,16 +47,6 @@
                 android:orientation="vertical" />
         </ScrollView>
 
-
-        <!-- Pulsante per accedere all'area riservata -->
-       <!--<Button
-            android:id="@+id/accessButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Area riservata"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_button"
-            android:textColor="@android:color/white" /> -->
     </LinearLayout>
 
 </LinearLayout>
