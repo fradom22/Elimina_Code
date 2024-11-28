@@ -58,24 +58,26 @@
         android:padding="16dp" />
 
     <!-- Pulsante Elimina Reparto -->
+
+    <!-- Pulsante Torna alla pagina principale -->
+
     <Button
         android:id="@+id/deleteRepartoButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Elimina Reparto"
-        android:background="@drawable/rounded_button"
-        android:textSize="18sp"
         android:layout_marginBottom="16dp"
-        android:padding="16dp" />
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:text="Elimina Reparto"
+        android:textSize="18sp" />
 
-    <!-- Pulsante Torna alla pagina principale -->
     <Button
         android:id="@+id/exitButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Torna alla pagina principale"
-        android:background="@drawable/rounded_button"
-        android:textSize="18sp"
         android:layout_marginTop="16dp"
-        android:padding="16dp" />
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:text="Torna alla pagina principale"
+        android:textSize="18sp" />
 </LinearLayout>

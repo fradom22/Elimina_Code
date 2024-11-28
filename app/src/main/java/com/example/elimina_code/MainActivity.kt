@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
@@ -18,7 +19,6 @@ import androidx.viewpager2.widget.ViewPager2
 import java.io.OutputStream
 import java.net.Socket
 
-
 class MainActivity : AppCompatActivity() {
 
     private var counter = 0
@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var outputStream: OutputStream
     private lateinit var viewPager: ViewPager2
     private lateinit var imageAdapter: ImageAdapter
+    private var isVisualMode: Boolean = false // Variabile per tracciare la modalità corrente
 
     private val images = listOf(
         R.drawable.image1,
@@ -35,20 +36,22 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val slideRunnable = Runnable { moveToNextSlide() }
 
-    // Variabile per la sequenza di tocchi
-    private var touchCount = 0
+    private var touchCount = 0 // Per la sequenza di tocchi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        updateRepartiUI()
+        // Carica i reparti salvati
+        RepartiManager.loadReparti(this)
+
+        // Recupera la modalità corrente
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        isVisualMode = sharedPreferences.getBoolean("isVisualMode", false)
+
+        updateRepartiUI(isVisualMode)
         initSlideshow()
-
-        // Aggiungi il rilevamento dei 3 tocchi nell'angolo in alto a destra
         setupTouchSequence()
-
-        // Inizializza la connessione alla stampante
         connectToPrinter("192.168.1.30", 9100)
     }
 
@@ -81,11 +84,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateRepartiUI() {
+    private fun updateRepartiUI(isVisualMode: Boolean) {
         val container = findViewById<LinearLayout>(R.id.repartiContainer)
         val noRepartiText = findViewById<TextView>(R.id.noRepartiText)
 
-        // Svuota il contenitore dei reparti
         container.removeAllViews()
 
         if (RepartiManager.counterMap.isEmpty()) {
@@ -93,58 +95,98 @@ class MainActivity : AppCompatActivity() {
         } else {
             noRepartiText.visibility = View.GONE
 
-            // Conta quanti reparti ci sono per il layout dinamico
-            val repartoCount = RepartiManager.counterMap.size
-
-            // Loop per creare i pulsanti dei reparti
             for ((repartoName, count) in RepartiManager.counterMap) {
-                val button = Button(this).apply {
-                    text = "$repartoName ($count)"
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT // Altezza variabile in base al contenuto
-                    ).apply {
-                        weight = 1f  // Distribuzione uniforme
-                        setMargins(16, 16, 16, 16) // Margini tra i pulsanti
+                if (isVisualMode) {
+                    // Modalità Visione
+                    val buttonLayout = LinearLayout(this).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        gravity = Gravity.CENTER_VERTICAL
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            0
+                        ).apply {
+                            weight = 1f
+                            setMargins(16, 16, 16, 16)
+                        }
+                        background = resources.getDrawable(R.drawable.rounded_button, null)
+                        setPadding(40, 40, 40, 40)
                     }
 
-                    // Imposta lo sfondo smussato
-                    background = resources.getDrawable(R.drawable.rounded_button, null)
+                    // Nome del reparto a sinistra
+                    val repartoNameView = TextView(this).apply {
+                        text = repartoName
+                        textSize = 32f
+                        setTextColor(android.graphics.Color.WHITE)
+                        gravity = Gravity.START
+                        layoutParams = LinearLayout.LayoutParams(
+                            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                        )
+                    }
 
-                    // Testo bianco sui pulsanti
-                    setTextColor(android.graphics.Color.WHITE)
+                    // Numero incrementale a destra
+                    val countView = TextView(this).apply {
+                        text = count.toString()
+                        textSize = 70f
+                        setTextColor(android.graphics.Color.WHITE)
+                        gravity = Gravity.END
+                        layoutParams = LinearLayout.LayoutParams(
+                            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                        )
+                    }
 
-                    // Aggiungere padding interno per "ciccionare" i pulsanti
-                    setPadding(40, 30, 40, 30) // Imposta padding per aumentarne la "pienezza"
+                    buttonLayout.addView(repartoNameView)
+                    buttonLayout.addView(countView)
 
-                    setOnClickListener {
+                    buttonLayout.setOnClickListener {
                         val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
                         RepartiManager.counterMap[repartoName] = newCount
-                        text = "$repartoName ($newCount)"
-
-                        // Invia il numero alla stampante
-                        counter++
-                        sendToPrinter(counter)
+                        countView.text = newCount.toString()
                     }
+
+                    container.addView(buttonLayout)
+                } else {
+                    // Modalità Stampa
+                    val button = Button(this).apply {
+                        text = "$repartoName ($count)"
+                        textSize = 27f
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            0
+                        ).apply {
+                            weight = 1f
+                            setMargins(16, 16, 16, 16)
+                        }
+                        background = resources.getDrawable(R.drawable.rounded_button, null)
+                        setTextColor(android.graphics.Color.WHITE)
+                        setPadding(40, 30, 40, 30)
+
+                        setOnClickListener {
+                            val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
+                            RepartiManager.counterMap[repartoName] = newCount
+                            text = "$repartoName ($newCount)"
+                            counter++
+                            sendToPrinter(counter)
+                        }
+                    }
+
+                    container.addView(button)
                 }
-                container.addView(button)
             }
         }
     }
-
 
     private fun setupTouchSequence() {
         val rootView = findViewById<View>(android.R.id.content)
         rootView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                if (isInTopLeftCorner(event.x, event.y)) { // Cambiato da topRight a topLeft
+                if (isInTopLeftCorner(event.x, event.y)) {
                     touchCount++
                     if (touchCount == 3) {
                         showPasswordDialog()
-                        touchCount = 0 // Resetta il contatore
+                        touchCount = 0
                     }
                 } else {
-                    touchCount = 0 // Resetta il contatore se il tocco non è nell'angolo
+                    touchCount = 0
                 }
             }
             true
@@ -154,26 +196,23 @@ class MainActivity : AppCompatActivity() {
     private fun isInTopLeftCorner(x: Float, y: Float): Boolean {
         val screenWidth = resources.displayMetrics.widthPixels
         val screenHeight = resources.displayMetrics.heightPixels
-        return x < screenWidth * 0.1 && y < screenHeight * 0.1 // Cambiato per l'angolo sinistro
+        return x < screenWidth * 0.1 && y < screenHeight * 0.1
     }
 
     private fun showPasswordDialog() {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setTitle("Accesso riservato")
 
-        // Crea il campo per inserire la password
         val passwordInput = EditText(this).apply {
             hint = "Inserisci la password"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
-            // Aggiungi padding per distanziare il testo dai bordi
-            setPadding(40, 30, 40, 30) // Aggiungi più padding ai lati del campo di input
+            setPadding(40, 30, 40, 30)
         }
 
-        // Crea il layout personalizzato per il dialogo
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(50, 50, 50, 50)  // Aggiungi padding per dare spazio ai contenuti
-            addView(passwordInput)      // Aggiungi il campo della password
+            setPadding(50, 50, 50, 50)
+            addView(passwordInput)
         }
 
         dialogBuilder.setView(layout)
@@ -187,17 +226,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         dialogBuilder.setNegativeButton("Annulla", null)
-
-        // Mostra il dialogo
         val dialog = dialogBuilder.create()
-        dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)  // Arrotondamento
-
+        dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)
         dialog.show()
     }
-
-
-
-
 
     private fun initSlideshow() {
         viewPager = findViewById(R.id.slideshow)
@@ -222,6 +254,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        updateRepartiUI() // Aggiorna l'interfaccia dei reparti ogni volta che torniamo alla MainActivity
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        isVisualMode = sharedPreferences.getBoolean("isVisualMode", false)
+        updateRepartiUI(isVisualMode)
     }
 }
