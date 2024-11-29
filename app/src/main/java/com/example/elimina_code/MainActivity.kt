@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import java.io.OutputStream
 import java.net.Socket
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
 
@@ -72,13 +74,54 @@ class MainActivity : AppCompatActivity() {
     private fun sendToPrinter(repartoName: String, number: Int) {
         Thread {
             try {
-                // Comandi ESC/POS per stampare
-                val escPosCommand = "\u001B" + "@\n"  // Reset della stampante
-                val textToPrint = "Reparto: $repartoName\nNumero: $number\n"  // Nome del reparto e numero
+                // Ottieni la data e l'ora attuali
+                val currentDate = SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Date())
+
+                // Comando di reset della stampante
+                val escPosCommand = "\u001B@"  // Reset della stampante (default)
+
+                // Comando per centratura del testo
+                val centeringCommand = "\u001B\u0061\u0001"  // ESC a 1: Testo centrato
+
+                // Comandi per diverse dimensioni del testo
+                val largeTextCommand = "\u001D!\u0033"  // GS ! 51: Testo extra grande e spesso
+                val extraLargeTextCommand = "\u001D!\u0011"  // GS ! 17: Testo grande senza grassetto
+                val boldTextOnCommand = "\u001B\u0045\u0001"  // ESC E 1: Grassetto ON
+                val boldTextOffCommand = "\u001B\u0045\u0000"  // ESC E 0: Grassetto OFF
+                val normalTextCommand = "\u001B!\u0000"  // ESC ! 0: Testo normale
+
+                // Comando per il taglio della carta
+                val cutPaperCommand = "\u001D\u0056\u0041"  // GS V 65: Taglia carta
+
+                // Formattazione per "ESYTECH" (testo grande e in grassetto, centrato)
+                val formattedHeader = "$centeringCommand$boldTextOnCommand$largeTextCommand" +
+                        "ESYTECH\n\n$boldTextOffCommand"
+
+                // Formattazione per il nome del reparto (testo grande senza grassetto, centrato)
+                val formattedRepartoName = "$centeringCommand$extraLargeTextCommand$repartoName\n\n"
+
+                // Formattazione per il numero (grande e grassetto)
+                val formattedNumber = "$centeringCommand$boldTextOnCommand$largeTextCommand$number\n\n$boldTextOffCommand"
+
+                // Formattazione per "GRAZIE PER L'ATTESA" (piccolo e in grassetto)
+                val formattedThanksMessage = "$centeringCommand$boldTextOnCommand$normalTextCommand" +
+                        "GRAZIE PER L'ATTESA\n\n$boldTextOffCommand"
+
+                // Formattazione per la data e l'ora
+                val formattedDateTime = "$centeringCommand$normalTextCommand$currentDate\n\n"
+
+                // Righe vuote per spazio extra tra le stampe
+                val extraSpacing = "\n\n\n\n\n\n"
 
                 // Invio dei comandi alla stampante
-                outputStream.write(escPosCommand.toByteArray())  // Reset
-                outputStream.write(textToPrint.toByteArray())    // Stampa il reparto e numero
+                outputStream.write(escPosCommand.toByteArray())  // Reset stampante
+                outputStream.write(formattedHeader.toByteArray())  // Intestazione "ESYTECH"
+                outputStream.write(formattedRepartoName.toByteArray())  // Nome del reparto
+                outputStream.write(formattedNumber.toByteArray())  // Numero del reparto
+                outputStream.write(formattedThanksMessage.toByteArray())  // "Grazie per l'attesa"
+                outputStream.write(formattedDateTime.toByteArray())  // Data e ora
+                outputStream.write(extraSpacing.toByteArray())  // Spazio tra le stampe
+                outputStream.write(cutPaperCommand.toByteArray())  // Taglio della carta
                 outputStream.flush()
 
                 runOnUiThread {
@@ -92,6 +135,11 @@ class MainActivity : AppCompatActivity() {
             }
         }.start()
     }
+
+
+
+
+
 
 
     private fun updateRepartiUI(isVisualMode: Boolean) {
