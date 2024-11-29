@@ -51,10 +51,12 @@ class AdminActivity : AppCompatActivity() {
             val dialogBuilder = AlertDialog.Builder(this)
             dialogBuilder.setTitle("Aggiungi Reparto")
 
+            // Layout personalizzato per il dialog
             val dialogLayout = layoutInflater.inflate(R.layout.dialog_add_reparto, null)
             val inputName = dialogLayout.findViewById<EditText>(R.id.inputRepartoName)
             val colorSpinner = dialogLayout.findViewById<Spinner>(R.id.colorSpinner)
 
+            // Configura lo spinner con i colori
             val colors = arrayOf("Verde", "Blu", "Rosso")
             val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, colors)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -62,22 +64,25 @@ class AdminActivity : AppCompatActivity() {
 
             dialogBuilder.setView(dialogLayout)
 
+            // Aggiungi i pulsanti OK e Annulla
             dialogBuilder.setPositiveButton("OK") { _, _ ->
                 val repartoName = inputName.text.toString().trim()
                 val selectedColor = colorSpinner.selectedItem.toString()
 
                 if (repartoName.isNotEmpty()) {
+                    // Converti il colore selezionato in codice colore
                     val colorCode = when (selectedColor) {
                         "Verde" -> "#4CAF50"
                         "Blu" -> "#2196F3"
                         "Rosso" -> "#F44336"
-                        else -> "#4CAF50"
+                        else -> "#4CAF50" // Default verde
                     }
 
+                    // Aggiungi il reparto con il colore selezionato
                     RepartiManager.counterMap[repartoName] = 1
                     RepartiManager.colorMap[repartoName] = colorCode
 
-                    RepartiManager.saveReparti(this) // Salva i dati
+                    RepartiManager.saveReparti(this)
 
                     Toast.makeText(this, "Reparto aggiunto: $repartoName", Toast.LENGTH_SHORT).show()
                 } else {
@@ -85,10 +90,16 @@ class AdminActivity : AppCompatActivity() {
                 }
             }
 
+
             dialogBuilder.setNegativeButton("Annulla") { dialog, _ -> dialog.dismiss() }
-            dialogBuilder.show()
+
+            // Crea il dialog e applica lo sfondo stondato
+            val dialog = dialogBuilder.create()
+            dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog) // Sfondo stondato
+            dialog.show()
         }
     }
+
 
 
     private fun setupResetButton() {
@@ -107,23 +118,32 @@ class AdminActivity : AppCompatActivity() {
         val deleteRepartoButton = findViewById<Button>(R.id.deleteRepartoButton)
         deleteRepartoButton.setOnClickListener {
             val repartoNames = RepartiManager.counterMap.keys.toList()
+
             val dialogBuilder = AlertDialog.Builder(this)
             dialogBuilder.setTitle("Seleziona il reparto da eliminare")
 
+            // Lista dei reparti da eliminare
             dialogBuilder.setItems(repartoNames.toTypedArray()) { _, which ->
                 val repartoName = repartoNames[which]
                 RepartiManager.counterMap.remove(repartoName)
                 RepartiManager.colorMap.remove(repartoName)
 
-                RepartiManager.saveReparti(this) // Salva i dati
+                RepartiManager.saveReparti(this)
 
                 Toast.makeText(this, "Reparto $repartoName eliminato", Toast.LENGTH_SHORT).show()
             }
 
+
+
             dialogBuilder.setNegativeButton("Annulla") { dialog, _ -> dialog.dismiss() }
-            dialogBuilder.show()
+
+            // Crea il dialog e applica lo sfondo stondato
+            val dialog = dialogBuilder.create()
+            dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog) // Sfondo stondato
+            dialog.show()
         }
     }
+
 
 
     private fun setupExitButton() {
