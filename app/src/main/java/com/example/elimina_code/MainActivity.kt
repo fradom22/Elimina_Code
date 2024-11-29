@@ -50,37 +50,49 @@ class MainActivity : AppCompatActivity() {
         updateRepartiUI(isVisualMode)
         initSlideshow()
         setupTouchSequence()
-        connectToPrinter("192.168.1.30", 9100)
+        connectToPrinter("192.168.1.168", 9100)
     }
 
     private fun connectToPrinter(ip: String, port: Int) {
-        try {
-            printerSocket = Socket(ip, port)
-            outputStream = printerSocket.getOutputStream()
-            Toast.makeText(this, "Stampante connessa", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Errore di connessione: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+        Thread {
+            try {
+                printerSocket = Socket(ip, port)
+                outputStream = printerSocket.getOutputStream()
+                runOnUiThread {
+                    Toast.makeText(this, "Stampante connessa", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "Errore di connessione: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 
     private fun sendToPrinter(number: Int) {
-        try {
-            val escPosCommand = "\u001B" + "@\n"
-            val textToPrint = "Numero: $number\n"
+        Thread {
+            try {
+                // Comandi ESC/POS per stampare
+                val escPosCommand = "\u001B" + "@\n"  // Reset della stampante
+                val textToPrint = "Numero: $number\n"  // Numero del reparto da stampare
 
-            outputStream.write(escPosCommand.toByteArray())
-            outputStream.write(textToPrint.toByteArray())
-            outputStream.flush()
+                // Invio dei comandi alla stampante
+                outputStream.write(escPosCommand.toByteArray())  // Reset
+                outputStream.write(textToPrint.toByteArray())    // Stampa il numero
+                outputStream.flush()
 
-            outputStream.close()
-            printerSocket.close()
+                runOnUiThread {
+                    Toast.makeText(this, "Stampa completata", Toast.LENGTH_SHORT).show()
+                }
 
-            connectToPrinter("192.168.50.30", 9101)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Errore di stampa: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "Errore di stampa: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
+
 
     private fun updateRepartiUI(isVisualMode: Boolean) {
         val container = findViewById<LinearLayout>(R.id.repartiContainer)
