@@ -23,7 +23,8 @@ import java.util.Date
 
 class MainActivity : AppCompatActivity() {
 
-    private var counter = 0
+    private var counter = -1 // Contatore parte da 0
+
     private lateinit var printerSocket: Socket
     private lateinit var outputStream: OutputStream
     private lateinit var viewPager: ViewPager2
@@ -72,6 +73,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendToPrinter(repartoName: String, number: Int) {
+        // Se siamo in modalità visione, non fare nulla
+        if (isVisualMode) {
+            return
+        }
+
+        // Procedi con la stampa solo se NON siamo in modalità visione
         Thread {
             try {
                 // Ottieni la data e l'ora attuali
@@ -136,12 +143,6 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
-
-
-
-
-
-
     private fun updateRepartiUI(isVisualMode: Boolean) {
         val container = findViewById<LinearLayout>(R.id.repartiContainer)
         val noRepartiText = findViewById<TextView>(R.id.noRepartiText)
@@ -181,9 +182,9 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
-                    // Numero incrementale a destra
+                    // Numero a destra (visualizzato e incrementato in modalità visiva)
                     val countView = TextView(this).apply {
-                        text = count.toString()
+                        text = count.toString()  // Mostra il numero
                         textSize = 70f  // Numero grande
                         setTextColor(android.graphics.Color.WHITE)
                         gravity = Gravity.END
@@ -195,17 +196,22 @@ class MainActivity : AppCompatActivity() {
                     buttonLayout.addView(repartoNameView)
                     buttonLayout.addView(countView)
 
+                    // In modalità visiva, quando clicchi sul pulsante si incrementa il numero
                     buttonLayout.setOnClickListener {
-                        val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
+                        // Incremento del contatore
+                        val newCount = (RepartiManager.counterMap[repartoName] ?: -1) + 1
                         RepartiManager.counterMap[repartoName] = newCount
-                        countView.text = newCount.toString()
+                        countView.text = newCount.toString()  // Aggiorna il numero visualizzato
+
+                        // Salvataggio del contatore aggiornato
+                        saveCounters()  // Aggiorna la memoria persistente
                     }
 
                     container.addView(buttonLayout)
                 } else {
                     // Modalità Stampa
                     val button = Button(this).apply {
-                        text = "$repartoName ($count)"
+                        text = repartoName  // Mostra solo il nome del reparto, senza il numero
                         textSize = 32f
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -218,11 +224,15 @@ class MainActivity : AppCompatActivity() {
                         setTextColor(android.graphics.Color.WHITE)
                         setPadding(40, 30, 40, 30)
 
+                        // In modalità stampa, quando clicchi sul pulsante si incrementa il numero e si stampa
                         setOnClickListener {
-                            val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
+                            // Incremento del contatore
+                            val newCount = (RepartiManager.counterMap[repartoName] ?: -1) + 1
                             RepartiManager.counterMap[repartoName] = newCount
-                            text = "$repartoName ($newCount)"
-                            sendToPrinter(repartoName, newCount)
+                            sendToPrinter(repartoName, newCount)  // Invia alla stampante con il numero incrementato
+
+                            // Salvataggio del contatore aggiornato
+                            saveCounters()  // Salva il contatore dopo l'aggiornamento
                         }
                     }
 
@@ -231,6 +241,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // Funzione per salvare i contatori aggiornati
+    private fun saveCounters() {
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // Salva il contatore nella memoria persistente
+        RepartiManager.counterMap.forEach { (repartoName, count) ->
+            editor.putInt(repartoName, count)
+        }
+
+        editor.apply()  // Salva le modifiche
+    }
+
+
 
 
 
