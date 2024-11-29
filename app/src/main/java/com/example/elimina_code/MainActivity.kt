@@ -69,16 +69,16 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
-    private fun sendToPrinter(number: Int) {
+    private fun sendToPrinter(repartoName: String, number: Int) {
         Thread {
             try {
                 // Comandi ESC/POS per stampare
                 val escPosCommand = "\u001B" + "@\n"  // Reset della stampante
-                val textToPrint = "Numero: $number\n"  // Numero del reparto da stampare
+                val textToPrint = "Reparto: $repartoName\nNumero: $number\n"  // Nome del reparto e numero
 
                 // Invio dei comandi alla stampante
                 outputStream.write(escPosCommand.toByteArray())  // Reset
-                outputStream.write(textToPrint.toByteArray())    // Stampa il numero
+                outputStream.write(textToPrint.toByteArray())    // Stampa il reparto e numero
                 outputStream.flush()
 
                 runOnUiThread {
@@ -105,113 +105,55 @@ class MainActivity : AppCompatActivity() {
         } else {
             noRepartiText.visibility = View.GONE
 
-            // Verifica se c'è un solo reparto
-            val repartoCount = RepartiManager.counterMap.size
-
             for ((repartoName, count) in RepartiManager.counterMap) {
                 if (isVisualMode) {
-                    if (repartoCount == 1) {
-                        // Solo un reparto registrato: nome in alto, numero al centro
-                        val buttonLayout = LinearLayout(this).apply {
-                            orientation = LinearLayout.VERTICAL
-                            gravity = Gravity.CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                0
-                            ).apply {
-                                weight = 1f
-                                setMargins(16, 16, 16, 16)
-                            }
-                            background = resources.getDrawable(R.drawable.rounded_button, null)
-                            setPadding(40, 40, 40, 40)
+                    // Modalità visiva
+                    val buttonLayout = LinearLayout(this).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        gravity = Gravity.CENTER_VERTICAL
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            weight = 1f
+                            setMargins(16, 16, 16, 16)
                         }
-
-                        // Nome del reparto in alto
-                        val repartoNameView = TextView(this).apply {
-                            text = repartoName
-                            textSize = 32f  // Nome più grande
-                            setTextColor(android.graphics.Color.WHITE)
-                            gravity = Gravity.CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                topMargin = 10 // Sposta il nome verso l'alto
-                            }
-                        }
-
-                        // Numero incrementale al centro
-                        val countView = TextView(this).apply {
-                            text = count.toString()
-                            textSize = 100f  // Numero molto grande
-                            setTextColor(android.graphics.Color.WHITE)
-                            gravity = Gravity.CENTER
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            )
-                        }
-
-                        buttonLayout.addView(repartoNameView)
-                        buttonLayout.addView(countView)
-
-                        buttonLayout.setOnClickListener {
-                            val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
-                            RepartiManager.counterMap[repartoName] = newCount
-                            countView.text = newCount.toString()
-                        }
-
-                        container.addView(buttonLayout)
-
-                    } else {
-                        // Modalità visione per più reparti
-                        val buttonLayout = LinearLayout(this).apply {
-                            orientation = LinearLayout.HORIZONTAL
-                            gravity = Gravity.CENTER_VERTICAL
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                0
-                            ).apply {
-                                weight = 1f
-                                setMargins(16, 16, 16, 16)
-                            }
-                            background = resources.getDrawable(R.drawable.rounded_button, null)
-                            setPadding(40, 40, 40, 40)
-                        }
-
-                        // Nome del reparto a sinistra
-                        val repartoNameView = TextView(this).apply {
-                            text = repartoName
-                            textSize = 32f
-                            setTextColor(android.graphics.Color.WHITE)
-                            gravity = Gravity.START
-                            layoutParams = LinearLayout.LayoutParams(
-                                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-                            )
-                        }
-
-                        // Numero incrementale a destra
-                        val countView = TextView(this).apply {
-                            text = count.toString()
-                            textSize = 70f  // Numero grande
-                            setTextColor(android.graphics.Color.WHITE)
-                            gravity = Gravity.END
-                            layoutParams = LinearLayout.LayoutParams(
-                                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-                            )
-                        }
-
-                        buttonLayout.addView(repartoNameView)
-                        buttonLayout.addView(countView)
-
-                        buttonLayout.setOnClickListener {
-                            val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
-                            RepartiManager.counterMap[repartoName] = newCount
-                            countView.text = newCount.toString()
-                        }
-
-                        container.addView(buttonLayout)
+                        background = resources.getDrawable(R.drawable.rounded_button, null)
+                        setPadding(40, 40, 40, 40)
                     }
+
+                    // Nome del reparto a sinistra
+                    val repartoNameView = TextView(this).apply {
+                        text = repartoName
+                        textSize = 32f
+                        setTextColor(android.graphics.Color.WHITE)
+                        gravity = Gravity.START
+                        layoutParams = LinearLayout.LayoutParams(
+                            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                        )
+                    }
+
+                    // Numero incrementale a destra
+                    val countView = TextView(this).apply {
+                        text = count.toString()
+                        textSize = 70f  // Numero grande
+                        setTextColor(android.graphics.Color.WHITE)
+                        gravity = Gravity.END
+                        layoutParams = LinearLayout.LayoutParams(
+                            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                        )
+                    }
+
+                    buttonLayout.addView(repartoNameView)
+                    buttonLayout.addView(countView)
+
+                    buttonLayout.setOnClickListener {
+                        val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
+                        RepartiManager.counterMap[repartoName] = newCount
+                        countView.text = newCount.toString()
+                    }
+
+                    container.addView(buttonLayout)
                 } else {
                     // Modalità Stampa
                     val button = Button(this).apply {
@@ -232,8 +174,7 @@ class MainActivity : AppCompatActivity() {
                             val newCount = RepartiManager.counterMap[repartoName]?.plus(1) ?: 1
                             RepartiManager.counterMap[repartoName] = newCount
                             text = "$repartoName ($newCount)"
-                            counter++
-                            sendToPrinter(counter)
+                            sendToPrinter(repartoName, newCount)
                         }
                     }
 
