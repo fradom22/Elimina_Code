@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity)
 
+    implementation ("com.rometools:rome:1.18.0")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

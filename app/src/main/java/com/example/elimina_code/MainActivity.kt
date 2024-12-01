@@ -1,7 +1,9 @@
 package com.example.elimina_code
 
+
 import ImageAdapter
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,6 +22,10 @@ import java.io.OutputStream
 import java.net.Socket
 import java.text.SimpleDateFormat
 import java.util.Date
+import android.os.Build
+import android.view.WindowInsets
+import android.view.WindowInsetsController
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val images = listOf(
         R.drawable.image1,
     )
+
     private val handler = Handler(Looper.getMainLooper())
     private val slideRunnable = Runnable { moveToNextSlide() }
 
@@ -41,13 +48,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+
+        // Imposta il layout landscape o portrait
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main) // Questo carica il layout landscape
+            initLandscapeLayout()
+        }else{
+            setContentView(R.layout.activity_main) // Layout portrait
+            initPortaitLayout()
+        }
+
+        hideSystemUI()
 
         // Carica i reparti salvati
         RepartiManager.loadReparti(this)
 
         // Recupera la modalità corrente
         val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+
         isVisualMode = sharedPreferences.getBoolean("isVisualMode", false)
 
         updateRepartiUI(isVisualMode)
@@ -55,6 +74,110 @@ class MainActivity : AppCompatActivity() {
         setupTouchSequence()
         connectToPrinter("192.168.1.168", 9100)
     }
+
+    private fun initPortaitLayout() {
+        val timeTextView = findViewById<TextView>(R.id.timeTextView) // Assicurati che l'ID sia corretto
+        val handler = Handler(Looper.getMainLooper())
+
+        // Aggiorna data e ora ogni secondo
+        val updateTimeRunnable = object : Runnable {
+            override fun run() {
+                val currentTime = Calendar.getInstance().time
+                val sdf = SimpleDateFormat("dd MMM yyyy   HH:mm", Locale.getDefault())
+                timeTextView.text = sdf.format(currentTime)
+                handler.postDelayed(this, 1000)
+            }
+        }
+        handler.post(updateTimeRunnable)
+    }
+
+
+    private fun initLandscapeLayout() {
+        val timeTextView = findViewById<TextView>(R.id.timeTextView) // Assicurati che l'ID sia corretto
+        val handler = Handler(Looper.getMainLooper())
+
+        // Aggiorna data e ora ogni secondo
+        val updateTimeRunnable = object : Runnable {
+            override fun run() {
+                val currentTime = Calendar.getInstance().time
+                val sdf = SimpleDateFormat("dd MMM yyyy   HH:mm", Locale.getDefault())
+                timeTextView.text = sdf.format(currentTime)
+                handler.postDelayed(this, 1000)
+            }
+        }
+        handler.post(updateTimeRunnable)
+    }
+
+
+    private fun updateNewsTicker() {
+        val newsTicker = findViewById<TextView>(R.id.newsTicker)
+        val feedUrl = "https://www.ansa.it/sito/ansait_rss.xml"
+
+        // Recupera le notizie in un thread separato
+        Thread {
+            val news = RSSParser.getNewsFromFeed(feedUrl)
+            runOnUiThread {
+                if (news.isNotEmpty()) {
+                    // Combina le notizie in una stringa unica
+                    val newsText = news.joinToString(" • ")
+                    newsTicker.text = newsText
+                    newsTicker.isSelected = true // Necessario per il marquee
+                } else {
+                    newsTicker.text = "Nessuna notizia disponibile"
+                }
+            }
+        }.start()
+    }
+
+    private val updateNewsRunnable = object : Runnable {
+        override fun run() {
+            updateNewsTicker()
+            handler.postDelayed(this, 60000) // Aggiorna ogni minuto
+        }
+    }
+
+
+
+
+
+
+    private fun hideSystemUI() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Se il dispositivo ha Android 11 (API livello 30) o superiore
+            val windowInsetsController = window.insetsController
+            windowInsetsController?.let {
+                it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()) // Nascondi barra di stato e navigazione
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE // Mostra le barre se l'utente scorre verso il basso
+            }
+        } else {
+            // Per dispositivi con versioni di Android inferiori a 11 (API livello 30)
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or // Nascondi la barra di stato
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or // Nascondi la barra di navigazione
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) // Rendere il comportamento immersivo (l'utente deve fare swipe per mostrare le barre)
+        }
+    }
+
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        // Riferimenti alle barre
+        val topBar = findViewById<LinearLayout>(R.id.topBar)
+        val bottomBar = findViewById<LinearLayout>(R.id.bottomBar)
+
+        // Verifica l'orientamento
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape, mostra le barre
+            topBar.visibility = View.VISIBLE
+            bottomBar.visibility = View.VISIBLE
+        } else {
+            // In portrait, nascondi le barre
+            topBar.visibility = View.GONE
+            bottomBar.visibility = View.GONE
+        }
+    }
+
 
     private fun connectToPrinter(ip: String, port: Int) {
         Thread {
@@ -338,8 +461,33 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        updateNewsTicker()
+        handler.post(updateNewsRunnable)
         val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
-        isVisualMode = sharedPreferences.getBoolean("isVisualMode", false)
-        updateRepartiUI(isVisualMode)
+
+
+            // Recupera la modalità corrente dalle preferenze
+            isVisualMode = sharedPreferences.getBoolean("isVisualMode", false)
+
+            // Recupera l'orientamento corrente
+            val orientation = resources.configuration.orientation
+            val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+
+            // Aggiorna l'interfaccia utente in base alla modalità e all'orientamento
+            updateRepartiUI(isVisualMode)
+
+            // Gestisci la visibilità delle barre
+            val topBar = findViewById<LinearLayout>(R.id.topBar)
+            val bottomBar = findViewById<LinearLayout>(R.id.bottomBar)
+
+            if (isVisualMode) {
+                // In modalità landscape e in modalità visual, mostra le barre
+                topBar.visibility = View.VISIBLE
+                bottomBar.visibility = View.VISIBLE
+            } else if (!isVisualMode) {
+                // In modalità portrait e stampa, mostra solo la barra superiore
+                topBar.visibility = View.VISIBLE
+                bottomBar.visibility = View.GONE
+            }
     }
 }

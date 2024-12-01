@@ -6,6 +6,44 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Barra superiore (visibile portrait) -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Logo sulla sinistra -->
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:src="@drawable/logo"
+            android:contentDescription="Logo" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <!-- Ora sulla destra -->
+        <TextView
+            android:id="@+id/timeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="00:00"
+            android:textSize="30sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif" />
+
+    </LinearLayout>
+
+
     <!-- Contenitore per lo slideshow delle immagini -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/slideshow"
@@ -48,5 +86,33 @@
         </ScrollView>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_button"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/newsTicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-bold"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:scrollHorizontally="true"
+            android:gravity="center_vertical"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

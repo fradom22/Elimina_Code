@@ -1,63 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <!-- Contenitore per lo slideshow delle immagini -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/slideshow"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/rounded_image_slider"
-        android:clipToPadding="true"
-        android:padding="10dp" />
-
-    <!-- Contenitore per i reparti -->
+    <!-- Barra superiore (visibile landscape) -->
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <!-- Messaggio Nessun Reparto -->
+        <!-- Logo sulla sinistra -->
+     <ImageView
+            android:id="@+id/logo"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:src="@drawable/logo"
+            android:contentDescription="Logo" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <!-- Ora sulla destra -->
         <TextView
-            android:id="@+id/noRepartiText"
+            android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nessun reparto disponibile"
-            android:textSize="18sp"
-            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:text="00:00"
+            android:textSize="30sp"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:fontFamily="sans-serif" />
 
-        <!-- ScrollView per i reparti -->
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+    </LinearLayout>
+
+    <!-- Contenitore per ViewPager e Reparti -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Contenitore per lo slideshow delle immagini -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/slideshow"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:fillViewport="true">
+            android:background="@drawable/rounded_image_slider" />
 
-            <LinearLayout
-                android:id="@+id/repartiContainer"
-                android:layout_width="match_parent"
+        <!-- Contenitore per i reparti -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/noRepartiText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+                android:text="Nessun reparto disponibile"
+                android:textSize="18sp"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
+            <!-- ScrollView per i reparti -->
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
 
-        <!-- Pulsante per accedere all'area riservata -->
-        <!--<Button
-             android:id="@+id/accessButton"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:text="Area riservata"
-             android:layout_marginTop="16dp"
-             android:background="@drawable/rounded_button"
-             android:textColor="@android:color/white" /> -->
+                <LinearLayout
+                    android:id="@+id/repartiContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </ScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Barra inferiore (visibile solo in landscape) -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/newsTicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-bold"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:scrollHorizontally="true"
+            android:gravity="center_vertical"/>
+
     </LinearLayout>
 
 </LinearLayout>
