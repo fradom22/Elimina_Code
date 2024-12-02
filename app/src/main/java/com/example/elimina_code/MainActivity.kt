@@ -1,7 +1,7 @@
 package com.example.elimina_code
 
-
 import ImageAdapter
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -25,11 +25,11 @@ import java.util.Date
 import android.os.Build
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.widget.ImageView
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var counter = -1 // Contatore parte da 0
 
     private lateinit var printerSocket: Socket
     private lateinit var outputStream: OutputStream
@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun updateNewsTicker() {
         val newsTicker = findViewById<TextView>(R.id.newsTicker)
         val feedUrl = "https://www.ansa.it/sito/ansait_rss.xml"
@@ -195,6 +196,7 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun sendToPrinter(repartoName: String, number: Int) {
         // Se siamo in modalità visione, non fare nulla
         if (isVisualMode) {
@@ -266,6 +268,7 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n")
     private fun updateRepartiUI(isVisualMode: Boolean) {
         val container = findViewById<LinearLayout>(R.id.repartiContainer)
         val noRepartiText = findViewById<TextView>(R.id.noRepartiText)
@@ -356,6 +359,7 @@ class MainActivity : AppCompatActivity() {
                             RepartiManager.counterMap[repartoName] = newCount
                             sendToPrinter(repartoName, newCount)  // Invia alla stampante con il numero incrementato
 
+                            showTakeNumberDialog()
 
                             // Salvataggio del contatore aggiornato
                             saveCounters()  // Salva il contatore dopo l'aggiornamento
@@ -382,6 +386,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     fun showServingNumberDialog(repartoName: String, number: Int) {
         // Gonfia il layout personalizzato
         val dialogView = layoutInflater.inflate(R.layout.dialog_serving_number, null)
@@ -394,7 +399,7 @@ class MainActivity : AppCompatActivity() {
         // Imposta il nome del reparto in grande
         servingTitle.text = repartoName  // Nome del reparto
 
-        // Imposta il testo "Serviamo il numero:"
+
         servingLabel.text = "Serviamo il numero:"
 
         // Imposta il numero in grassetto
@@ -417,11 +422,33 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun showTakeNumberDialog() {
+        // Gonfia il layout del dialogo
+        val dialogView = layoutInflater.inflate(R.layout.dialog_take_number, null)
+        val dialogImageView = dialogView.findViewById<ImageView>(R.id.dialogImage)
+
+        dialogImageView.setImageResource(R.drawable.scontr)
+
+        // Costruisci il dialogo con il layout personalizzato
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setCancelable(true) // Permette di chiudere il dialogo cliccando fuori
+
+        // Crea e mostra il dialogo
+        val dialog = dialogBuilder.create()
+        dialog.show()
+
+        // Imposta uno sfondo arrotondato (opzionale)
+        dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)
+
+        // Usa un Handler per chiudere il dialogo automaticamente dopo 2 secondi
+        Handler(Looper.getMainLooper()).postDelayed({
+            dialog.dismiss()
+        }, 5000) // Chiudi dopo 3 secondi
+    }
 
 
-
-
-
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupTouchSequence() {
         val rootView = findViewById<View>(android.R.id.content)
         rootView.setOnTouchListener { _, event ->
@@ -511,7 +538,7 @@ class MainActivity : AppCompatActivity() {
 
             // Recupera l'orientamento corrente
             val orientation = resources.configuration.orientation
-            val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+        orientation == Configuration.ORIENTATION_LANDSCAPE
 
             // Aggiorna l'interfaccia utente in base alla modalità e all'orientamento
             updateRepartiUI(isVisualMode)
