@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
     private val updateNewsRunnable = object : Runnable {
         override fun run() {
             updateNewsTicker()
-            handler.postDelayed(this, 60000) // Aggiorna ogni minuto
+            handler.postDelayed(this, 130000)
         }
     }
 
@@ -326,6 +326,8 @@ class MainActivity : AppCompatActivity() {
                         RepartiManager.counterMap[repartoName] = newCount
                         countView.text = newCount.toString()  // Aggiorna il numero visualizzato
 
+                        showServingNumberDialog(repartoName,newCount)
+
                         // Salvataggio del contatore aggiornato
                         saveCounters()  // Aggiorna la memoria persistente
                     }
@@ -354,6 +356,7 @@ class MainActivity : AppCompatActivity() {
                             RepartiManager.counterMap[repartoName] = newCount
                             sendToPrinter(repartoName, newCount)  // Invia alla stampante con il numero incrementato
 
+
                             // Salvataggio del contatore aggiornato
                             saveCounters()  // Salva il contatore dopo l'aggiornamento
                         }
@@ -377,6 +380,43 @@ class MainActivity : AppCompatActivity() {
 
         editor.apply()  // Salva le modifiche
     }
+
+
+    fun showServingNumberDialog(repartoName: String, number: Int) {
+        // Gonfia il layout personalizzato
+        val dialogView = layoutInflater.inflate(R.layout.dialog_serving_number, null)
+
+        // Trova i TextView e imposta il contenuto
+        val servingTitle = dialogView.findViewById<TextView>(R.id.servingTitle)
+        val servingLabel = dialogView.findViewById<TextView>(R.id.servingLabel)
+        val servingNumber = dialogView.findViewById<TextView>(R.id.servingNumber)
+
+        // Imposta il nome del reparto in grande
+        servingTitle.text = repartoName  // Nome del reparto
+
+        // Imposta il testo "Serviamo il numero:"
+        servingLabel.text = "Serviamo il numero:"
+
+        // Imposta il numero in grassetto
+        servingNumber.text = number.toString()  // Numero associato
+
+        // Costruisci il dialog con il layout personalizzato
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setView(dialogView)
+
+        // Crea e mostra il dialog
+        val dialog = dialogBuilder.create()
+        dialog.show()
+
+        dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_dialog)
+
+        // Usa un Handler per chiudere il dialog dopo 2 secondi
+        Handler(Looper.getMainLooper()).postDelayed({
+            dialog.dismiss()
+        }, 3000) // 2000 millisecondi = 2 secondi
+    }
+
+
 
 
 

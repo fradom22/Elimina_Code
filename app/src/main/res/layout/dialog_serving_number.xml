@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <!-- Nome del reparto in grande -->
+    <TextView
+        android:id="@+id/servingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome del Reparto"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="30dp"/>
+
+    <!-- Testo fisso "Serviamo il numero:" -->
+    <TextView
+        android:id="@+id/servingLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Serviamo il numero:"
+        android:textSize="25sp"
+        android:layout_marginBottom="25dp"/>
+
+    <!-- Numero del reparto in grassetto -->
+    <TextView
+        android:id="@+id/servingNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="100sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/holo_red_dark"/>
+
+</LinearLayout>
