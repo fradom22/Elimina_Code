@@ -225,9 +225,9 @@ class MainActivity : AppCompatActivity() {
                 // Comando per il taglio della carta
                 val cutPaperCommand = "\u001D\u0056\u0041"  // GS V 65: Taglia carta
 
-                // Formattazione per "ESYTECH" (testo grande e in grassetto, centrato)
+                // Formattazione per "EliminaC" (testo grande e in grassetto, centrato)
                 val formattedHeader = "$centeringCommand$boldTextOnCommand$largeTextCommand" +
-                        "ESYTECH\n\n$boldTextOffCommand"
+                        "EliminaC\n\n$boldTextOffCommand"
 
                 // Formattazione per il nome del reparto (testo grande senza grassetto, centrato)
                 val formattedRepartoName = "$centeringCommand$extraLargeTextCommand$repartoName\n\n"
@@ -247,7 +247,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Invio dei comandi alla stampante
                 outputStream.write(escPosCommand.toByteArray())  // Reset stampante
-                outputStream.write(formattedHeader.toByteArray())  // Intestazione "ESYTECH"
+
                 outputStream.write(formattedRepartoName.toByteArray())  // Nome del reparto
                 outputStream.write(formattedNumber.toByteArray())  // Numero del reparto
                 outputStream.write(formattedThanksMessage.toByteArray())  // "Grazie per l'attesa"
@@ -538,7 +538,7 @@ class MainActivity : AppCompatActivity() {
 
             // Recupera l'orientamento corrente
             val orientation = resources.configuration.orientation
-        orientation == Configuration.ORIENTATION_LANDSCAPE
+            orientation == Configuration.ORIENTATION_LANDSCAPE
 
             // Aggiorna l'interfaccia utente in base alla modalità e all'orientamento
             updateRepartiUI(isVisualMode)
